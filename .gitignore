@@ -1,0 +1,9 @@
+# Folders
+venv/
+dist/
+build/
+__pycache__/
+trash/
+
+# Files
+*.spec
