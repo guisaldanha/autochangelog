@@ -1,5 +1,7 @@
 # AUTOCHANGELOG
 
+autochangelog is a tool to automatically generate changelogs from git commits.
+
 ## What is this?
 
 This is a tool to automatically generate a CHANGELOG.md file from your git history.
