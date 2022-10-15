@@ -102,7 +102,10 @@ class AutoChangelog(object):
             if tag == '':
                 return currentTag
             else:
-                return tag.split('tag: ').pop().removesuffix(')')
+                tag = tag.split('tag: ').pop().removesuffix(')')
+                if ',' in tag:
+                    tag = tag.split(',')[0]
+                return tag
 
     def getTagMessage(self, tag):
         if (tag == 'unreleased'):
