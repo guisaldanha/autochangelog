@@ -7,4 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [unreleased](https://github.com/guisaldanha/autochangelog/releases/tag/unreleased) - 2022-10-15
 
-- first commit - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([7c2b253](https://github.com/guisaldanha/autochangelog/commit/7c2b253))
+- Added --tags to push - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([cca191b](https://github.com/guisaldanha/autochangelog/commit/cca191b))
+
+- Added README - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([1c4242d](https://github.com/guisaldanha/autochangelog/commit/1c4242d))
+
+- first commit - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([ba3c76f](https://github.com/guisaldanha/autochangelog/commit/ba3c76f))
