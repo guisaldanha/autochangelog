@@ -208,7 +208,7 @@ class AutoChangelog(object):
             if self.remote_git != '':
                 sp.check_output(
                     'cd ' + self.git_path +
-                    '&& git push origin --tags', shell=True)
+                    '&& git push && git push origin --tags', shell=True)
                 print('Remote repository updated')
             else:
                 print('No remote repository configured')
