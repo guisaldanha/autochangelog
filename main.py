@@ -11,6 +11,7 @@ def main():
         epilog='Example: autochangelog -g /path/to/git/repository -t /path/to/template_file.md -o /path/to/output -u -p'
     )
     parser.version = VERSION
+    parser.author = 'Guilherme Saldanha'
     parser.add_argument("-v", "--version", action="version")
     parser.add_argument(
         "-a", "--amend", help="Amend the last commit with the generated CHANGELOG.md. The CHANGELOG.md file will be added to the last commit.",
