@@ -26,6 +26,9 @@ def main():
         "-f", "--force", help="Add the -f command to the amend and push commands",
         action="store_true")
     parser.add_argument(
+        "-rm", "--remove_message", help="Remove the autocreated message from CHANGELOG.md file",
+    )
+    parser.add_argument(
         "-g", "--git_path", help="Path to the directory containing the git repository. For the current directory, use '.' or leave blank.")
     parser.add_argument(
         "-t", "--template_path", help="Path to the template file. To use the built-in template in the program, leave it blank.")

@@ -9,7 +9,7 @@ from template import template
 class AutoChangelog(object):
     """Generate changelog from git log"""
 
-    def __init__(self, git_path=None, template_path=None, output_path='.', remote_git=None, amend=False, push=False, changelog_file=None, force=False):
+    def __init__(self, git_path=None, template_path=None, output_path='.', remote_git=None, amend=False, push=False, changelog_file=None, force=False, remove_message=False):
         """Initialize changelog generator
         git_path: path to git repository
         template_path: path to template file
@@ -17,6 +17,7 @@ class AutoChangelog(object):
         self.changelog_file = changelog_file if changelog_file is not None else 'CHANGELOG.md'
         self.git_path = git_path if git_path else '.'
         self.template_path = template_path
+        self.remove_message = remove_message
         self.changelog = []
         self.changelog_rendered = ''
         self.generate()
@@ -168,7 +169,7 @@ class AutoChangelog(object):
         template = Template(self.template)
         # replace many \n with \n
         rendered = template.render(
-            remote_git=self.remote_git, changelog=self.changelog)
+            remote_git=self.remote_git, changelog=self.changelog, remove_message=self.remove_message)
         self.changelog_rendered = re.sub(
             r'(\n\s*\n)+', '\n\n', rendered).strip() + '\n'
 
