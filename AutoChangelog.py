@@ -80,13 +80,13 @@ class AutoChangelog(object):
     def getChangeType(self, message):
         """Get change type from commit message"""
         changeType = ''
-        if ':' in message:
-            changeType = message.split(':')[0].strip().capitalize()
+        if ': ' in message:
+            changeType = message.split(': ')[0].strip().capitalize()
         return changeType
 
     def getCommitMessage(self, message):
-        if ':' in message:
-            message = message[message.index(':') + 1:]
+        if ': ' in message:
+            message = message[message.index(': ') + 1:]
             return message.strip()
         else:
             return message

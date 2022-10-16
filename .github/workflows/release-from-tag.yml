@@ -20,5 +20,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
+          body: |
+            To see the changes in this version, see the CHANGELOG.md file.
           draft: false
           prerelease: false
