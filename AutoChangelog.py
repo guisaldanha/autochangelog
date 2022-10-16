@@ -191,12 +191,32 @@ class AutoChangelog(object):
             hash = sp.check_output(
                 'cd ' + self.git_path +
                 '&& git rev-parse HEAD', shell=True, text=True).strip()
+
+            # check if tag exists in hash
+            output = sp.check_output(
+                'cd ' + self.git_path +
+                '&& git tag --points-at ' + hash, shell=True, text=True)
+            tag = str(output).strip()
+            if tag != '':
+                tagMessage = self.getTagMessage(tag)
+                # remove tag
+                sp.check_output(
+                'cd ' + self.git_path +
+                '&& git tag -d ' + tag, shell=True, text=True)
+
+            # amend changelog
             sp.check_output(
                 'cd ' + self.git_path +
                 '&& git reset ' + hash +
                 '&& git add  ' + self.changelog_file + ''
                 '&& git commit --amend --no-edit', shell=True)
             print('Changelog amended to commit ' + hash)
+            
+            # if tag exists, add tag again
+            sp.check_output(
+                'cd ' + self.git_path +
+                '&& git tag -a ' + tag + ' -m "' + tagMessage + '"', shell=True, text=True)
+            print('Tag ' + tag + ' added again')
 
         except sp.CalledProcessError as e:
             print('Error amending file: ' + str(e))
