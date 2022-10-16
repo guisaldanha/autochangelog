@@ -27,7 +27,7 @@ def main():
         action="store_true")
     parser.add_argument(
         "-rm", "--remove_message", help="Remove the autocreated message from CHANGELOG.md file",
-    )
+        action="store_true")
     parser.add_argument(
         "-g", "--git_path", help="Path to the directory containing the git repository. For the current directory, use '.' or leave blank.")
     parser.add_argument(
