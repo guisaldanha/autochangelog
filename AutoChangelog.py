@@ -9,7 +9,7 @@ from template import template
 class AutoChangelog(object):
     """Generate changelog from git log"""
 
-    def __init__(self, git_path=None, template_path=None, output_path='.', remote_git=None, amend=False, push=False, changelog_file=None):
+    def __init__(self, git_path=None, template_path=None, output_path='.', remote_git=None, amend=False, push=False, changelog_file=None, force=False):
         """Initialize changelog generator
         git_path: path to git repository
         template_path: path to template file
@@ -26,6 +26,7 @@ class AutoChangelog(object):
         self.render()
         self.output_path = output_path if output_path else '.'
         self.save()
+        self.force = force
         if amend:
             self.amend()
         if push:
@@ -225,10 +226,12 @@ class AutoChangelog(object):
     def push(self):
         """Push changes to remote repository"""
         try:
+            force = '' if self.force == False else ' --f'
             if self.remote_git != '':
                 sp.check_output(
                     'cd ' + self.git_path +
-                    '&& git push && git push origin --tags', shell=True)
+                    '&& git push ' + force +
+                    '&& git push origin --tags' + force, shell=True)
                 print('Remote repository updated')
             else:
                 print('No remote repository configured')

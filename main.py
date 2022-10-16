@@ -23,6 +23,9 @@ def main():
         "-ap", "--amend-push", help="Amend the last commit and push it to the remote origin, if it exists.",
         action="store_true")
     parser.add_argument(
+        "-f", "--force", help="Add the -f command to the amend and push commands",
+        action="store_true")
+    parser.add_argument(
         "-g", "--git_path", help="Path to the directory containing the git repository. For the current directory, use '.' or leave blank.")
     parser.add_argument(
         "-t", "--template_path", help="Path to the template file. To use the built-in template in the program, leave it blank.")
