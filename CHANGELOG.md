@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7](https://github.com/guisaldanha/autochangelog/releases/tag/1.0.7) - Versão 1.0.7 - 2022-10-16
+
+### Adjusted
+
+- -f command - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([d87a5fb](https://github.com/guisaldanha/autochangelog/commit/d87a5fb))
+
 ## [1.0.6](https://github.com/guisaldanha/autochangelog/releases/tag/1.0.6) - Versão 1.0.6 - 2022-10-16
 
 ### Added
 
-- Template for changelogs in template folder - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([aee0801](https://github.com/guisaldanha/autochangelog/commit/aee0801))
+- Template for changelogs in template folder - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([fbb8524](https://github.com/guisaldanha/autochangelog/commit/fbb8524))
 
 - -f option - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([5d549d4](https://github.com/guisaldanha/autochangelog/commit/5d549d4))
 

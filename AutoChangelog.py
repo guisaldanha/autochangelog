@@ -226,7 +226,7 @@ class AutoChangelog(object):
     def push(self):
         """Push changes to remote repository"""
         try:
-            force = '' if self.force == False else ' --f'
+            force = '' if self.force == False else ' -f'
             if self.remote_git != '':
                 sp.check_output(
                     'cd ' + self.git_path +
