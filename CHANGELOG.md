@@ -5,13 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6](https://github.com/guisaldanha/autochangelog/releases/tag/1.0.6) - Versão 1.0.6 - 2022-10-16
+
+### Added
+
+- Template for changelogs in template folder - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([aee0801](https://github.com/guisaldanha/autochangelog/commit/aee0801))
+
+- -f option - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([5d549d4](https://github.com/guisaldanha/autochangelog/commit/5d549d4))
+
 ## [1.0.5](https://github.com/guisaldanha/autochangelog/releases/tag/1.0.5) - Versão 1.0.5 - 2022-10-16
 
 - Requirements file created - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([830a3ed](https://github.com/guisaldanha/autochangelog/commit/830a3ed))
 
 ### Adjusted
 
-- Indent of amend function - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([ed512f3](https://github.com/guisaldanha/autochangelog/commit/ed512f3))
+- Indent of amend function - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-16 ([45b6fc2](https://github.com/guisaldanha/autochangelog/commit/45b6fc2))
 
 ## [1.0.4](https://github.com/guisaldanha/autochangelog/releases/tag/1.0.4) - Versão 1.0.4 - 2022-10-15
 
