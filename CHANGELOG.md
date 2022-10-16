@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3](https://github.com/guisaldanha/autochangelog/releases/tag/1.0.3) - Versão 1.0.3 - 2022-10-15
+
+- Workflow created - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([5762907](https://github.com/guisaldanha/autochangelog/commit/5762907))
+
+- Create release.yml - 2022-10-15 ([e51238c](https://github.com/guisaldanha/autochangelog/commit/e51238c))
+
 ## [1.0.2](https://github.com/guisaldanha/autochangelog/releases/tag/1.0.2) - Versão 1.0.2 - 2022-10-15
 
 ### Added
@@ -15,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- When amending the existing tag, if it exists, it is now applied to the commit of amend - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([82e7980](https://github.com/guisaldanha/autochangelog/commit/82e7980))
+- When amending the existing tag, if it exists, it is now applied to the commit of amend - [@guisaldanha](https://github.com/guisaldanha)  - 2022-10-15 ([222ddc1](https://github.com/guisaldanha/autochangelog/commit/222ddc1))
 
 ### Removed
 
