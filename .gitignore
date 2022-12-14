@@ -6,4 +6,7 @@ __pycache__/
 trash/
 
 # Files
+test.py
+
+# Extensions
 *.spec

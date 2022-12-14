@@ -3,7 +3,7 @@ import argparse
 
 
 def main():
-    VERSION = "Changelog Generator 1.0.3"
+    VERSION = "Changelog Generator 1.0.9"
 
     parser = argparse.ArgumentParser(
         prog='autochangelog',
