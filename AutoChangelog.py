@@ -82,14 +82,14 @@ class AutoChangelog(object):
         changeType = ''
         if ': ' in message:
             changeType = message.split(': ')[0].strip().capitalize()
-        return changeType
+        return changeType.capitalize()
 
     def getCommitMessage(self, message):
         if ': ' in message:
             message = message[message.index(': ') + 1:]
-            return message.strip()
+            return message.strip().capitalize()
         else:
-            return message
+            return message.capitalize()
 
     def valueInDictList(self, value, dictList):
         for dict in dictList:
