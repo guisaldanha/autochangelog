@@ -1,6 +1,6 @@
 # AUTOCHANGELOG
 
-autochangelog is a tool to automatically generate changelogs from git commits.
+Autochangelog is a tool to automatically generate changelogs, like [this](CHANGELOG.md), from git commits.
 
 ## What is this?
 
@@ -10,7 +10,7 @@ This is a tool to automatically generate a CHANGELOG.md file from your git histo
 
 ### On Windows
 
-1. Download the latest release from [here](https://guisaldanha.com/downloads/autochangelog.exe) and extract it to the Windows directory.
+1. Download the latest release from [here](https://guisaldanha.com/downloads/autochangelog.exe) and extract it to the Windows directory, or add the Windows directory to the PATH environment variable.
 2. Ready. You can now use the autochangelog command on any folder on your computer.
 
 ### How to use
@@ -18,6 +18,8 @@ This is a tool to automatically generate a CHANGELOG.md file from your git histo
 1. Open a terminal in the folder you want to generate the changelog for.
 2. Run the command `autochangelog`.
 3. Ready. You can now find the changelog in the `CHANGELOG.md` file.
+
+**Note:** If you want create subtitles for each commit, you can use the `:` character in the commit message. For example, if you want to create a subtitle called "Added", you can use the commit message `Added: Added a new feature`. The subtitle will be created automatically and the commits will be added to it.
 
 ## Many options
 
