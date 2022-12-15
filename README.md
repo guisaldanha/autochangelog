@@ -10,10 +10,10 @@ This is a tool to automatically generate a CHANGELOG.md file from your git histo
 
 ### On Windows
 
-1. Download the latest release from [here]() and extract it to the Windows directory.
+1. Download the latest release from [here](https://guisaldanha.com/downloads/autochangelog.exe) and extract it to the Windows directory.
 2. Ready. You can now use the autochangelog command on any folder on your computer.
 
-## How to use
+### How to use
 
 1. Open a terminal in the folder you want to generate the changelog for.
 2. Run the command `autochangelog`.
@@ -48,3 +48,29 @@ You can use the following options:
 
 You can use Jinja2 templates to customize the output of the CHANGELOG.md file. You can use the following variables:
 
+- **changelog** - List of tags. Each tag has the following attributes:
+  - **tag** - List of tags. Each tag has the following attributes:
+    - **tag** - Tag name.
+    - **message** - Tag message.
+    - **date** - Tag date.
+    - **changes** - List of changes. Each change has the following attributes:
+      - **changes** - A list of changes. Each change has the following attributes:
+        - **message** - Commit message.
+        - **date** - Commit date.
+        - **hash** - Commit hash.
+        - **user** - The user who made the commit.
+- **remote_git** - URL of the remote git repository.
+
+## How to contribute
+
+1. Fork the repository.
+2. Create a new branch.
+3. Make your changes.
+4. Create a pull request.
+5. Done.
+
+Or you can just open an issue if you find a bug or want to suggest a new feature.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
