@@ -125,7 +125,7 @@ class AutoChangelog(object):
             output = sp.check_output('cd ' + self.git_path +
                                     '&& git log --pretty="%h%x09%cs%x09%an%x09%d%x09%s"', text=False, shell=True)
             output = output.decode('utf-8')
-            
+
             if output.startswith('fatal'):
                 print(output)
                 sys.exit()
@@ -214,8 +214,16 @@ class AutoChangelog(object):
                 '&& git add  ' + self.changelog_file + ''
                 '&& git commit --amend --no-edit', shell=True)
             print('Changelog amended to commit ' + hash)
-            
-                
+
+            # amend changelog
+            sp.check_output(
+                'cd ' + self.git_path +
+                '&& git reset ' + hash +
+                '&& git add  ' + self.changelog_file + ''
+                '&& git commit --amend --no-edit', shell=True)
+            print('Changelog amended to commit ' + hash)
+
+
                 # if tag exists, add tag again
             if tag != '':
                 sp.check_output(
