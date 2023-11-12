@@ -30,6 +30,7 @@ class AutoChangelog(object):
         self.force = force
         if amend:
             self.amend()
+            self.amend()
         if push:
             self.push()
 
@@ -206,14 +207,6 @@ class AutoChangelog(object):
                 'cd ' + self.git_path +
                 '&& git tag -d ' + tag, shell=True, text=True)
                 print('Tag removed: ' + tag)
-
-            # amend changelog
-            sp.check_output(
-                'cd ' + self.git_path +
-                '&& git reset ' + hash +
-                '&& git add  ' + self.changelog_file + ''
-                '&& git commit --amend --no-edit', shell=True)
-            print('Changelog amended to commit ' + hash)
 
             # amend changelog
             sp.check_output(
