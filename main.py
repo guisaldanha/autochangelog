@@ -1,16 +1,15 @@
 from AutoChangelog import AutoChangelog
+from _version import VERSION
 import argparse
 
 
 def main():
-    VERSION = "Changelog Generator 1.0.9"
-
     parser = argparse.ArgumentParser(
         prog='autochangelog',
         description='Generate CHANGELOG.md from git log',
-        epilog='Example: autochangelog -g /path/to/git/repository -t /path/to/template_file.md -o /path/to/output -u -p'
+        epilog='Example: autochangelog -g /path/to/git/repository -t /path/to/template_file.md -o /path/to/output -p'
     )
-    parser.version = VERSION
+    parser.version = 'Changelog Generator ' + VERSION
     parser.author = 'Guilherme Saldanha'
     parser.add_argument("-v", "--version", action="version")
     parser.add_argument(
@@ -51,6 +50,7 @@ def main():
     args = vars(args)
 
     changelog = AutoChangelog(**args)
+    changelog.run()
 
 
 if __name__ == "__main__":

@@ -5,22 +5,86 @@ on:
 
 name: Create Release From Tags
 
+permissions:
+  contents: write
+
 jobs:
-  build:
-    name: Create Release
+  build-windows-exe:
+    name: Build Windows executable
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build dependencies
+        run: pip install -r requirements-build.txt
+      - name: Build executable
+        run: pyinstaller --noconfirm autochangelog.spec
+      - name: Build installer
+        run: iscc InnoSetup\autochangelog.iss
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: autochangelog-windows
+          path: |
+            dist/autochangelog.exe
+            dist/AutoChangelogSetup*.exe
+
+  build-unix-binary:
+    name: Build ${{ matrix.os == 'ubuntu-latest' && 'Linux' || 'macOS' }} binary
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset_name: linux
+          - os: macos-latest
+            asset_name: macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build dependencies
+        run: pip install -r requirements-build.txt
+      - name: Build executable
+        run: pyinstaller --noconfirm autochangelog.spec
+      - name: Package archive
+        id: package
+        run: |
+          arch="$(uname -m)"
+          archive="autochangelog-${{ matrix.asset_name }}-${arch}.tar.gz"
+          chmod +x dist/autochangelog
+          tar -C dist -czf "$archive" autochangelog
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+      - name: Upload executable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: autochangelog-${{ matrix.asset_name }}
+          path: ${{ steps.package.outputs.archive }}
+
+  release:
+    name: Create GitHub Release
+    needs: [build-windows-exe, build-unix-binary]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        uses: actions/checkout@v4
+      - name: Download executable artifacts
+        uses: actions/download-artifact@v4
         with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          body: |
-            To see the changes in this version, see the CHANGELOG.md file.
-          draft: false
-          prerelease: false
+          pattern: autochangelog-*
+          path: dist
+          merge-multiple: true
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" dist/autochangelog.exe dist/AutoChangelogSetup*.exe dist/autochangelog-linux-*.tar.gz dist/autochangelog-macos-*.tar.gz \
+            --title "${{ github.ref_name }}" \
+            --notes "See CHANGELOG.md for details."

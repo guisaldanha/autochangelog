@@ -1,0 +1,10 @@
+# Only needed to build native binaries with PyInstaller.
+# Not required to run or test autochangelog from source.
+-r requirements.txt
+altgraph==0.17.4
+packaging==23.2
+pefile==2023.2.7; sys_platform == 'win32'
+pyinstaller==6.2.0
+pyinstaller-hooks-contrib==2023.10
+pywin32-ctypes==0.2.2; sys_platform == 'win32'
+setuptools==68.2.2

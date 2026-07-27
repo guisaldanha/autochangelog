@@ -1,0 +1,3 @@
+# Needed to run the test suite (pytest).
+-r requirements.txt
+pytest>=7.4

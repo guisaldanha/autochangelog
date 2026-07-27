@@ -9,30 +9,50 @@ from template import template
 class AutoChangelog(object):
     """Generate changelog from git log"""
 
+    COMMIT_PATTERN = re.compile(r'(.*?)\t(.*?)\t(.*?)\t(.*?)\t(.*)')
+
     def __init__(self, git_path=None, template_path=None, output_path='.', remote_git=None, amend=False, push=False, changelog_file=None, force=False, remove_message=False):
-        """Initialize changelog generator
-        git_path: path to git repository
-        template_path: path to template file
+        """Configure the changelog generator.
+
+        This only stores configuration - no git or filesystem I/O happens
+        until build() or run() is called.
         """
         self.changelog_file = changelog_file if changelog_file is not None else 'CHANGELOG.md'
         self.git_path = git_path if git_path else '.'
         self.template_path = template_path
+        self.output_path = output_path if output_path else '.'
+        self.remote_git = remote_git
         self.remove_message = remove_message
+        self.force = force
+        self.amend_requested = amend
+        self.push_requested = push
         self.changelog = []
         self.changelog_rendered = ''
+
+    def build(self):
+        """Read git history and render the changelog in memory.
+
+        No files are written and no git state is changed by this method.
+        """
         self.generate()
         self.setTemplate()
-        self.remote_git = remote_git
         self.getRepositoryURL()
         self.render()
-        self.output_path = output_path if output_path else '.'
+        return self.changelog_rendered
+
+    def run(self):
+        """Build the changelog and apply the requested side effects (save/amend/push)."""
+        self.build()
         self.save()
-        self.force = force
-        if amend:
+        if self.amend_requested:
             self.amend()
-            self.amend()
-        if push:
+        if self.push_requested:
             self.push()
+        return self.changelog_rendered
+
+    def _git(self, *args):
+        """Run a git command against the target repository and return its stdout as text."""
+        return sp.check_output(['git', *args], cwd=self.git_path, encoding='utf-8')
 
     def generate(self):
         """Generate model"""
@@ -41,49 +61,63 @@ class AutoChangelog(object):
         currentTag = 'unreleased'
 
         commits = self.getGitHistory()
+        changelogByTag = {}
+
+        # When --amend is requested, HEAD's commit hash is about to change
+        # (amending changes the tree, which changes the commit hash), so the
+        # hash we'd embed for it right now would already be stale the moment
+        # the amend finishes. Flag that entry so the template can skip its
+        # (necessarily wrong) hash link instead of rendering a dead link.
+        headHash = self._git(
+            'rev-parse', '--short', 'HEAD').strip() if self.amend_requested else None
 
         for commit in commits:
-            parts = re.search('(.*?)\t(.*?)\t(.*?)\t(.*?)\t(.*)', commit)
+            parts = self.COMMIT_PATTERN.search(commit)
+            assert parts is not None
             hash, date, user, tag, message = parts.groups()
 
-            user = '' if user.find(' ') != -1 else user
+            user = '' if ' ' in user else user
             currentTag = self.getTag(tag, currentTag)
             tagDate = tagDate if tag == '' else date
-            tagMessage = self.getTagMessage(currentTag)
-            if self.valueInDictList(currentTag, self.changelog) == False:
-                self.changelog.append({
+            changeType = self.getChangeType(message)
+            commitEntry = {
+                'hash': hash,
+                'date': date,
+                'user': user,
+                'message': self.getCommitMessage(message),
+                'pending_amend': hash == headHash
+            }
+
+            if currentTag not in changelogByTag:
+                # tag message is only ever needed the first time we see this tag
+                changelogByTag[currentTag] = {
                     'tag': currentTag,
                     'date': tagDate,
-                    'message': tagMessage,
-                    'changes': {self.getChangeType(message): [{'hash': hash, 'date': date, 'user': user, 'message': self.getCommitMessage(message)}]}
-                })
+                    'message': self.getTagMessage(currentTag),
+                    'changes': {changeType: [commitEntry]}
+                }
             else:
-                for dict in self.changelog:
-                    if currentTag in dict.values():
-                        if self.getChangeType(message) in dict['changes']:
-                            dict['changes'][self.getChangeType(message)].append(
-                                {'hash': hash, 'date': date, 'user': user, 'message': self.getCommitMessage(message)})
-                        else:
-                            dict['changes'][self.getChangeType(message)] = [
-                                {'hash': hash, 'date': date, 'user': user, 'message': self.getCommitMessage(message)}]
+                changes = changelogByTag[currentTag]['changes']
+                changes.setdefault(changeType, []).append(commitEntry)
+
+        self.changelog = list(changelogByTag.values())
+
         # order changes by date
-        for dict in self.changelog:
-            for changeType in dict['changes']:
-                dict['changes'][changeType] = sorted(
-                    dict['changes'][changeType], key=lambda k: k['date'], reverse=True)
-        # order changes by type
-        for dict in self.changelog:
-            dict['changes'] = {k: v for k, v in sorted(
-                dict['changes'].items(), key=lambda item: item[0])}
+        for entry in self.changelog:
+            for changeType in entry['changes']:
+                entry['changes'][changeType] = sorted(
+                    entry['changes'][changeType], key=lambda k: k['date'], reverse=True)
+            # order changes by type
+            entry['changes'] = dict(
+                sorted(entry['changes'].items(), key=lambda item: item[0]))
 
         return self.changelog
 
     def getChangeType(self, message):
         """Get change type from commit message"""
-        changeType = ''
         if ': ' in message:
-            changeType = message.split(': ')[0].strip().capitalize()
-        return changeType.capitalize()
+            return message.split(': ', 1)[0].strip().capitalize()
+        return ''
 
     def getCommitMessage(self, message):
         if ': ' in message:
@@ -92,51 +126,35 @@ class AutoChangelog(object):
         else:
             return message.capitalize()
 
-    def valueInDictList(self, value, dictList):
-        for dict in dictList:
-            if value in dict.values():
-                return True
-        return False
-
     def getTag(self, tag, currentTag):
         if 'tag' not in tag:
             return currentTag
-        else:
-            if tag == '':
-                return currentTag
-            else:
-                tag = tag.split('tag: ').pop().removesuffix(')')
-                if ',' in tag:
-                    tag = tag.split(',')[0]
-                return tag
+        tag = tag.split('tag: ').pop().removesuffix(')')
+        if ',' in tag:
+            tag = tag.split(',')[0]
+        return tag
 
     def getTagMessage(self, tag):
-        if (tag == 'unreleased'):
+        if tag == 'unreleased':
             return ''
-        output = sp.check_output(
-            'cd ' + self.git_path +
-            '&& git tag -l --format="%(subject)" ' + tag, shell=True)
-        subject = output.decode('utf-8')
-        return subject.strip()
+        output = self._git('tag', '-l', '--format=%(subject)', tag)
+        return output.strip()
 
     def getGitHistory(self):
         """Get git log and parse it"""
         try:
-            # PARTES: hash, date, author, tag, message
-            output = sp.check_output('cd ' + self.git_path +
-                                    '&& git log --pretty="%h%x09%cs%x09%an%x09%d%x09%s"', text=False, shell=True)
-            output = output.decode('utf-8')
+            output = self._git(
+                'log', '--pretty=%h%x09%cs%x09%an%x09%d%x09%s')
+        except sp.CalledProcessError:
+            print('Error: "' + self.git_path +
+                  '" is not a git repository, or it has no commits yet.', file=sys.stderr)
+            sys.exit(1)
+        except OSError as e:
+            print('Error running git (is it installed and on PATH?): ' +
+                  str(e), file=sys.stderr)
+            sys.exit(1)
 
-            if output.startswith('fatal'):
-                print(output)
-                sys.exit()
-
-            gitChangeLog = list(filter(None, output.split('\n')))
-
-            return gitChangeLog
-        except sp.CalledProcessError as e:
-            pass
-            sys.exit()
+        return list(filter(None, output.split('\n')))
 
     def setTemplate(self):
         if self.template_path is not None:
@@ -155,13 +173,11 @@ class AutoChangelog(object):
             return self.remote_git
         remote_git = ''
         try:
-            output = sp.check_output(
-                'cd ' + self.git_path +
-                '&& git config --get remote.origin.url', shell=True, text=True)
-            output = str(output).strip()
-            if output.strip() != '':
+            output = self._git(
+                'config', '--get', 'remote.origin.url').strip()
+            if output != '':
                 remote_git = output.removesuffix('.git')
-        except sp.CalledProcessError as e:
+        except sp.CalledProcessError:
             pass
         self.remote_git = remote_git
 
@@ -180,10 +196,11 @@ class AutoChangelog(object):
             if os.path.exists(self.output_path) == False:
                 os.makedirs(self.output_path)
             # save file
-            with open(self.output_path + '/' + self.changelog_file, 'w', encoding='UTF-8') as changelogFile:
+            self.changelog_full_path = os.path.abspath(
+                os.path.join(self.output_path, self.changelog_file))
+            with open(self.changelog_full_path, 'w', encoding='UTF-8') as changelogFile:
                 changelogFile.write(self.changelog_rendered)
-            print('Changelog saved to ' + self.output_path +
-                  '/' + self.changelog_file)
+            print('Changelog saved to ' + self.changelog_full_path)
         except Exception as e:
             print('Error saving file: ' + str(e))
             sys.exit(1)
@@ -191,37 +208,26 @@ class AutoChangelog(object):
     def amend(self):
         """Amend changelog file"""
         try:
-            hash = sp.check_output(
-                'cd ' + self.git_path +
-                '&& git rev-parse HEAD', shell=True, text=True).strip()
+            hash = self._git('rev-parse', 'HEAD').strip()
 
             # check if tag exists in hash
-            output = sp.check_output(
-                'cd ' + self.git_path +
-                '&& git tag --points-at ' + hash, shell=True, text=True)
-            tag = str(output).strip()
+            tag = self._git('tag', '--points-at', hash).strip()
             if tag != '':
                 tagMessage = self.getTagMessage(tag)
                 # remove tag
-                sp.check_output(
-                'cd ' + self.git_path +
-                '&& git tag -d ' + tag, shell=True, text=True)
+                self._git('tag', '-d', tag)
                 print('Tag removed: ' + tag)
 
             # amend changelog
-            sp.check_output(
-                'cd ' + self.git_path +
-                '&& git reset ' + hash +
-                '&& git add  ' + self.changelog_file + ''
-                '&& git commit --amend --no-edit', shell=True)
-            print('Changelog amended to commit ' + hash)
+            self._git('reset', hash)
+            self._git('add', self.changelog_full_path)
+            self._git('commit', '--amend', '--no-edit')
+            newHash = self._git('rev-parse', 'HEAD').strip()
+            print('Changelog amended to commit ' + newHash)
 
-
-                # if tag exists, add tag again
+            # if tag exists, add tag again
             if tag != '':
-                sp.check_output(
-                    'cd ' + self.git_path +
-                    '&& git tag -a ' + tag + ' -m "' + tagMessage + '"', shell=True, text=True)
+                self._git('tag', '-a', tag, '-m', tagMessage)
                 print('Tag ' + tag + ' added again')
 
         except sp.CalledProcessError as e:
@@ -231,16 +237,13 @@ class AutoChangelog(object):
     def push(self):
         """Push changes to remote repository"""
         try:
-            force = '' if self.force == False else ' -f'
-            if self.remote_git != '':
-                sp.check_output(
-                    'cd ' + self.git_path +
-                    '&& git push ' + force +
-                    '&& git push origin --tags' + force, shell=True)
-                print('Remote repository updated')
-            else:
+            if self.remote_git == '':
                 print('No remote repository configured')
                 sys.exit(1)
+            forceArgs = ['-f'] if self.force else []
+            self._git('push', *forceArgs)
+            self._git('push', 'origin', '--tags', *forceArgs)
+            print('Remote repository updated')
         except sp.CalledProcessError as e:
             print('Error pushing file: ' + str(e))
             sys.exit(1)
