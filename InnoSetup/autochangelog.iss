@@ -6,7 +6,7 @@
 ; Keep MyAppVersion in sync with _version.py on each release.
 
 #define MyAppName "AutoChangelog"
-#define MyAppVersion "2.0.0"
+#define MyAppVersion "2.0.1"
 #define MyAppPublisher "Guilherme Saldanha"
 #define MyAppURL "https://github.com/guisaldanha/autochangelog"
 #define MyAppExeName "autochangelog.exe"

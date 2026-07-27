@@ -133,6 +133,31 @@ class TestBuildHasNoSideEffects:
         assert not output_dir.exists()
 
 
+class TestUnreleasedHeadingHasNoDeadLink:
+    """The 'unreleased' tag has no matching GitHub release, so linking to
+    releases/tag/unreleased would 404. Only tagged entries should be linked.
+    """
+
+    def test_unreleased_heading_is_not_linked(self, git_repo):
+        commit(git_repo, 'Added: something')
+
+        rendered = AutoChangelog(
+            git_path=str(git_repo),
+            remote_git='https://github.com/example/repo').build()
+
+        assert '## unreleased' in rendered
+        assert 'releases/tag/unreleased' not in rendered
+
+    def test_tagged_release_is_still_linked(self, git_repo):
+        commit(git_repo, 'Added: something', tag='1.0.0')
+
+        rendered = AutoChangelog(
+            git_path=str(git_repo),
+            remote_git='https://github.com/example/repo').build()
+
+        assert '[1.0.0](https://github.com/example/repo/releases/tag/1.0.0)' in rendered
+
+
 class TestRun:
     def test_run_saves_changelog_file(self, git_repo, tmp_path):
         commit(git_repo, 'Added: something', tag='1.0.0')
