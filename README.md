@@ -21,6 +21,12 @@ This is a tool to automatically generate a CHANGELOG.md file from your git histo
 
 Uninstalling removes it from PATH again automatically.
 
+> **Using VS Code, another IDE, or Windows Terminal with tabs?** A plain new PowerShell/cmd window picks up the updated PATH immediately because Windows Explorer refreshes its own environment when the installer notifies it, and every window you open from Explorer inherits that fresh copy. Apps that were **already running** during install - VS Code included - keep the PATH they had when *they* started, and opening a new tab or window *inside* that same running app doesn't help, since it's still the same process. Fully quit the app (check Task Manager / your taskbar that no window of it is left, e.g. no `Code.exe`) and reopen it. If it still doesn't pick up the change, sign out and back into Windows (or reboot) - that forces every app to start fresh. As a one-off workaround inside an already-open PowerShell terminal, you can also refresh just that session with:
+>
+> ```powershell
+> $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+> ```
+
 > **Upgrading from an old manual install?** Older versions of this README suggested copying `autochangelog.exe` directly into the `C:\Windows` folder to get it on PATH. Windows always searches `C:\Windows` before it looks at the PATH variable at all, so if you did that, that old copy will keep shadowing any newer version you install - including this installer's. Delete `C:\Windows\autochangelog.exe` (requires an elevated/admin terminal) before installing the new version.
 
 ### 🐧 On Linux or macOS
